@@ -141,6 +141,7 @@ import {
   checkBackendHealth,
   createGeneratedResults,
   createGenerationJob,
+  getAiModelConfig,
   isLoggedIn,
   normalizeWords,
   pollGenerationJob,
@@ -599,6 +600,27 @@ export default {
     fillDemoWords() {
       this.rawWords = 'vivid, anchor, serene, pulse, orchard, glacier'
     },
+    ensureApiKeyReady() {
+      const modelConfig = getAiModelConfig()
+      const hasTextKey = Boolean(modelConfig.hasTextApiKey || modelConfig.textApiKeyMasked || modelConfig.textApiKey)
+      if (!isLoggedIn() || !hasTextKey) {
+        uni.showModal({
+          title: '请前往【我的】配置 API Key',
+          content: '登录并填入大模型 API Key 后即可使用 AI 智能生成。',
+          confirmText: '去配置',
+          cancelText: '稍后再说',
+          success: (res) => {
+            if (res.confirm) {
+              uni.reLaunch({
+                url: '/pages/profile/index',
+              })
+            }
+          },
+        })
+        return false
+      }
+      return true
+    },
     buildThoughts(results, words) {
       const first = results[0] || { word: words[0] || 'vivid', meaning: '生动的' }
 
@@ -994,6 +1016,10 @@ export default {
           title: '请至少输入 1 个单词',
           icon: 'none',
         })
+        return
+      }
+
+      if (!this.ensureApiKeyReady()) {
         return
       }
 
