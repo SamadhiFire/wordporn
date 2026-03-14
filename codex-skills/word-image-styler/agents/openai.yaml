@@ -1,0 +1,4 @@
+interface:
+  display_name: "Word Image Styler"
+  short_description: "Classify words and craft style-aware image prompts."
+  default_prompt: "Use $word-image-styler to classify these words and produce style-aware image prompts."
